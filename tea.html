@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tea Boiling Simulation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f2f2f2;
+        }
+
+        #stove {
+            width: 300px;
+            margin: 20px auto;
+            position: relative;
+        }
+
+        #pan {
+            width: 150px;
+            position: absolute;
+            top: -65px;
+            left: 78px;
+            transition: opacity 0.5s;
+        }
+
+        #flame {
+            position: absolute;
+            top: 50px;
+            left: 130px;
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle, rgba(255,165,0,1) 0%, rgba(255,69,0,1) 70%, rgba(255,0,0,0) 100%);
+            border-radius: 50%;
+            opacity: 0;
+            animation: flicker 0.1s infinite;
+            transition: opacity 0.5s, transform 0.5s;
+        }
+
+        @keyframes flicker {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        #bubbles {
+            position: absolute;
+            top: 20px;
+            left: 100px;
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(173,216,230,0.8) 50%, rgba(0,0,255,0) 100%);
+            border-radius: 50%;
+            opacity: 1;
+            animation: rise 3s infinite;
+        }
+
+        @keyframes rise {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-50px); opacity: 0; }
+        }
+
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #status {
+            margin: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tea Boiling Simulation</h1>
+    <div id="stove">
+        <img id="stove-img" src="stove-removebg-preview.png" alt="Stove">
+        <img id="pan" src="pan-removebg-preview.png" alt="Pan">
+        <div id="flame"></div>
+        <div id="bubbles"></div>
+    </div>
+    <div>
+        <button onclick="toggleBurner()">Toggle Burner</button>
+        <button onclick="adjustFlame(event)">Adjust Flame</button>
+    </div>
+    <div id="status">Burner is off.</div>
+
+    <script>
+        let burnerOn = false;
+        let flameLevel = "off";
+        let boilTimeout = null;
+
+        function toggleBurner() {
+            burnerOn = !burnerOn;
+            const flame = document.getElementById('flame');
+            const status = document.getElementById('status');
+
+            if (burnerOn) {
+                flameLevel = 'low';
+                flame.style.opacity = 0.5;
+                flame.style.transform = 'scale(0.8)';
+                status.textContent = "Burner is on. Flame level: Low.";
+            } else {
+                flameLevel = 'off';
+                flame.style.opacity = 0;
+                status.textContent = "Burner is off.";
+            }
+        }
+
+        function adjustFlame(event) {
+            if (!burnerOn) {
+                alert('Turn on the burner first!');
+                return;
+            }
+
+            const flame = document.getElementById('flame');
+            const status = document.getElementById('status');
+            const rect = event.target.getBoundingClientRect();
+            const clickX = event.clientX - rect.left;
+
+            if (clickX < rect.width / 2) {
+                flameLevel = 'low';
+                flame.style.opacity = 0.5;
+                flame.style.transform = 'scale(0.8)';
+                status.textContent = "Burner is on. Flame level: Low.";
+            } else {
+                flameLevel = 'high';
+                flame.style.opacity = 1;
+                flame.style.transform = 'scale(1.2)';
+                status.textContent = "Burner is on. Flame level: High.";
+            }
+        }
+        function startBoiling() {
+            const bubbles = document.getElementById('bubbles');
+
+            if (boilTimeout) {
+                clearTimeout(boilTimeout);
+            }
+
+            boilTimeout = setTimeout(() => {
+                bubbles.style.opacity = 1;
+            }, 3000); // Start boiling after 3 seconds of high flame
+        }
+
+        function stopBoiling() {
+            const bubbles = document.getElementById('bubbles');
+            bubbles.style.opacity = 0;
+
+            if (boilTimeout) {
+                clearTimeout(boilTimeout);
+                boilTimeout = null;
+            }
+        }
+    </script>
+</body>
+</html>
